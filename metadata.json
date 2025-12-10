@@ -1,0 +1,5 @@
+{
+  "name": "Crypto AI Analyst",
+  "description": "Phần mềm phân tích Crypto (BTC, ICP...) chuyên sâu sử dụng AI để tổng hợp dữ liệu On-chain, Price Action và Dòng tiền để đưa ra tín hiệu giao dịch.",
+  "requestFramePermissions": []
+}
