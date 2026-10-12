@@ -2,7 +2,7 @@
   "release": "SCM15_SHADOW_JOURNAL_V1",
   "repository": "vinhvo2010/BTC",
   "rootDirectory": "terminal",
-  "codeHash": "84455a3e5c49a548135bbb94bbc44d355e034e3a8bbda7e007b7c03cdb22d8aa",
+  "codeHash": "b7d74e92ca3de89301f1c5b962e8edcb5cf0a104488c6e003fd2dfe336b42ebd",
   "deploymentConfigHash": "5e5c58184a5df133f28be90b3e252b2ee9a988653e1af5080e0b8c863e3889bf",
   "configHash": "96f6e7225a750fb2ae06a4b01291b26a5f78e9b28e43cec61712490303c4b691",
   "config": {
@@ -38,11 +38,11 @@
     "paperOrderCreated": false
   },
   "sourceHashes": {
-    "api/feed.js": "7448f6c97fe6af450b54ac7640c56155b68f4672ae4fffd427dd0c25ee8294a5",
-    "api/history.js": "17d45d3e035ced14725c2fc109f6e6103b297469508f38a792980fd7c2b8cf9c",
+    "api/feed.js": "ad5c3d19981ee1217e9a8255c8cabe2be058f4f2776075633c785cac196f24a9",
+    "api/history.js": "a21760c4f3adf72dddcec14073dac5e8831c883b45d86c4b625f8d59371a6189",
     "api/live.js": "cc6cc9840ec72f7f6cc4422b764396cf5513996fea02206a3dfbee0c4c3e02be",
-    "index.html": "ba7d47b138f2c523d1625273704ba3ff13d0cdf195cd93202f93e077243f33e5",
-    "lib/cloud-read.js": "b6e9da42d46ed8c519f8a178be725d84e55650477e960984801f1ec6dbdda599",
+    "index.html": "055a42d9518ed32d3c540bdd75fc632f0aa5706ff9f71ff74c914a54428ca68f",
+    "lib/cloud-read.js": "984bccefb1556bf3f7936015dc74d3672463959badfb39b4b952fbf49eacf410",
     "lib/engine.js": "0da09399eadab96e55672f192186f281fff24a1533f92a8210d28353c2abe5b0",
     "lib/journal.js": "37ac5caaec3453ca26f90f3944d6f712c471854d68adcc2f9f90e198c5c7e955",
     "lib/multiframe.js": "c24b754846fc654a75c6e7f8ba3467692f302485a703e3a05bf957d395520226",

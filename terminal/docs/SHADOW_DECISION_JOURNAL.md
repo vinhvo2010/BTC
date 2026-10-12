@@ -33,3 +33,5 @@ Run npm test, npm run check, npm run build and node scripts/build-release.mjs --
 The cloud workflow commits only data/scm15. A transport/source/provenance error is recorded explicitly instead of losing the receipt. Unexpected unsafe output makes the job fail after writing a blocked record. Source hashes must match the scanner's reviewed release. Avoid parallel senders; this release has no notification transport.
 
 Rollback the Vercel alias to the baseline deployment if runtime/API smoke fails. If scheduler code is rolled back, preserve all recorded journal and scan files. Do not merge cohorts, fabricate missing past decisions or call fresh heartbeat trading readiness. GitHub scheduling is best effort, not a per-candle delivery SLA.
+
+Publication reads resolve the latest public GitHub commit feed and then fetch the state/journal at that immutable commit SHA. A cached main raw URL is never used as current receipt authority. History paging keeps the same source commit. Runtime code hash excludes the platform-managed Vercel build config; its hash is exposed separately as deploymentConfigHash.

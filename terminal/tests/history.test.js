@@ -5,7 +5,7 @@ import { makeScan } from "../lib/journal.js";
 import { payload,transport,res } from "./journal-fixture.mjs";
 async function call(url,rows){
  const saved=globalThis.fetch;try{
- globalThis.fetch=async()=>({ok:true,status:200,text:async()=>rows.map(x=>JSON.stringify(x)).join("\n")});
+ globalThis.fetch=async input=>({ok:true,status:200,text:async()=>String(input).endsWith(".atom")?"<feed><entry><id>tag:github.com,2008:Grit::Commit/cccccccccccccccccccccccccccccccccccccccc</id></entry></feed>":rows.map(x=>JSON.stringify(x)).join("\n")});
  const r=res();await handler({method:"GET",url},r);return r;
  }finally{globalThis.fetch=saved;}
 }

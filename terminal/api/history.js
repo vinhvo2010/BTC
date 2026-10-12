@@ -1,4 +1,4 @@
-import { readPublic } from "../lib/cloud-read.js";
+import { readPublic, resolvePublishedCommit } from "../lib/cloud-read.js";
 import { FRAMES, SYMBOLS } from "../lib/multiframe.js";
 export const config={maxDuration:30};
 export default async function handler(req,res) {
@@ -8,11 +8,13 @@ export default async function handler(req,res) {
   const date=url.searchParams.get("date")||new Date().toISOString().slice(0,10);
   const symbol=url.searchParams.get("symbol"),frame=url.searchParams.get("frame");
   const before=url.searchParams.get("before"),limit=Number(url.searchParams.get("limit")||50);
+  const ref=url.searchParams.get("ref");
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(limit)||limit<1||limit>200||
-      symbol&&!SYMBOLS.includes(symbol)||frame&&!FRAMES.includes(frame)||before?.length>300)
+      symbol&&!SYMBOLS.includes(symbol)||frame&&!FRAMES.includes(frame)||before?.length>300||ref&&!/^[a-f0-9]{40}$/.test(ref))
     return res.status(400).json({status:"INVALID_HISTORY_QUERY",records:[]});
   try {
-    const text=await readPublic("journal/"+date+".ndjson",32*1024*1024);
+    const sourceCommit=ref||await resolvePublishedCommit();
+    const text=await readPublic("journal/"+date+".ndjson",32*1024*1024,sourceCommit);
     if(text===null)return res.status(200).json({status:"NO_RECORDED_DECISIONS",date,
       records:[],nextCursor:null,executionEnabled:false,unknownBeforeMonitoring:true});
     let rows=text.split("\n").filter(Boolean).map(x=>JSON.parse(x));
@@ -25,7 +27,7 @@ export default async function handler(req,res) {
       if(offset<0)return res.status(409).json({status:"HISTORY_CURSOR_NOT_FOUND",records:[]});
       rows=rows.slice(offset+1);}
     const records=rows.slice(0,limit);
-    return res.status(200).json({status:"RECORDED_SHADOW_DECISIONS",date,records,
+    return res.status(200).json({status:"RECORDED_SHADOW_DECISIONS",date,sourceCommit,records,
       nextCursor:rows.length>limit?records.at(-1).id:null,
       source:"GITHUB_IMMUTABLE_SCAN_AND_APPEND_ONLY_JOURNAL",executionEnabled:false,
       unknownBeforeMonitoring:true});

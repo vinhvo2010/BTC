@@ -205,7 +205,7 @@ h1{margin:19px 0 7px;font-size:clamp(29px,4vw,51px);line-height:1.13;letter-spac
 <script type="module">
 const $=id=>document.getElementById(id);
 let current=null;let loading=false;let cloudHistory=[];let selectedFrame="15m";let selectedSymbol="ENAUSDT";
-let historyRecords=[],historyCursor=null,historyRequest=0,historyStatus="Đang đọc nhật ký...";
+let historyRecords=[],historyCursor=null,historySourceCommit=null,historyRequest=0,historyStatus="Đang đọc nhật ký...";
 $("history-date").value=new Date().toISOString().slice(0,10);
 const formatNumber=(v,d=5)=>typeof v==="number"?v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
 const when=t=>t?new Date(t).toLocaleString("vi-VN",{timeZone:"Asia/Ho_Chi_Minh",hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",hour12:false}):"—";
@@ -588,7 +588,7 @@ async function refreshHistory(append=false){
   const query=new URLSearchParams({date:$("history-date").value,limit:"30"});
   if($("history-symbol").value)query.set("symbol",$("history-symbol").value);
   if($("history-frame").value)query.set("frame",$("history-frame").value);
-  if(append&&historyCursor)query.set("before",historyCursor);
+  if(append&&historyCursor){query.set("before",historyCursor);if(historySourceCommit)query.set("ref",historySourceCommit);}
   try{
     const response=await fetch("/api/history?"+query,{cache:"no-store",signal:AbortSignal.timeout(15000)});
     if(!response.ok)throw new Error("HTTP_"+response.status);
@@ -597,7 +597,7 @@ async function refreshHistory(append=false){
     if(!["RECORDED_SHADOW_DECISIONS","NO_RECORDED_DECISIONS"].includes(result.status))
       throw new Error(result.status||"HISTORY_UNAVAILABLE");
     historyRecords=append?[...historyRecords,...result.records]:result.records;
-    historyCursor=result.nextCursor||null;
+    historyCursor=result.nextCursor||null;historySourceCommit=result.sourceCommit||null;
     historyStatus="Chưa có quyết định được ghi cho bộ lọc này. Thời gian trước khi bật nhật ký chưa được xác minh.";
     renderEvents(current);
   }catch(e){

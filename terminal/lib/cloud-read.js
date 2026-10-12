@@ -1,9 +1,22 @@
 import { FRAMES, SYMBOLS } from "./multiframe.js";
 import { RELEASE } from "./provenance.js";
 import { JOURNAL_VERSION } from "./journal.js";
-export const BASE="https://raw.githubusercontent.com/vinhvo2010/BTC/main/data/scm15/";
-export async function readPublic(relative,maxBytes=3*1024*1024) {
-  const response=await fetch(BASE+relative,{signal:AbortSignal.timeout(9000),cache:"no-store",
+export const BASE="https://raw.githubusercontent.com/vinhvo2010/BTC/";
+export async function resolvePublishedCommit() {
+  const response=await fetch("https://github.com/vinhvo2010/BTC/commits/main.atom",{
+    signal:AbortSignal.timeout(6000),cache:"no-store",
+    headers:{Accept:"application/atom+xml","Cache-Control":"no-cache"}});
+  if(!response.ok)throw new Error("PUBLISHED_HEAD_HTTP_"+response.status);
+  const xml=await response.text();
+  if(Buffer.byteLength(xml)>1024*1024)throw new Error("PUBLISHED_HEAD_TOO_LARGE");
+  const sha=xml.match(/<id>\s*tag:github\.com,2008:Grit::Commit\/([a-f0-9]{40})\s*<\/id>/)?.[1];
+  if(!sha)throw new Error("PUBLISHED_HEAD_UNVERIFIED");
+  return sha;
+}
+export async function readPublic(relative,maxBytes=3*1024*1024,sourceCommit=null) {
+  const commit=sourceCommit??await resolvePublishedCommit();
+  if(!/^[a-f0-9]{40}$/.test(commit))throw new Error("PUBLISHED_HEAD_UNVERIFIED");
+  const response=await fetch(BASE+commit+"/data/scm15/"+relative,{signal:AbortSignal.timeout(9000),cache:"no-store",
     headers:{Accept:"application/json"}});
   if(response.status===404)return null;
   if(!response.ok)throw new Error("GITHUB_HTTP_"+response.status);

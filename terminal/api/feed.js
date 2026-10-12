@@ -1,9 +1,10 @@
-import { readPublic, validateIndex } from "../lib/cloud-read.js";
+import { readPublic, validateIndex, resolvePublishedCommit } from "../lib/cloud-read.js";
 export default async function handler(req,res) {
   res.setHeader("Cache-Control","no-store, max-age=0");
   if(req.method!=="GET")return res.status(405).json({status:"METHOD_NOT_ALLOWED"});
   try {
-    const text=await readPublic("state.json");
+    const sourceCommit=await resolvePublishedCommit();
+    const text=await readPublic("state.json",3*1024*1024,sourceCommit);
     if(text===null)return res.status(200).json({status:"AWAITING_FIRST_CLOUD_RUN",verified:false,
       archivedReadyPlans:[],recentDecisions:[],actualOrdersEnabled:false,executionEnabled:false});
     const raw=JSON.parse(text),now=Date.now(),health=validateIndex(raw,now);
@@ -13,7 +14,7 @@ export default async function handler(req,res) {
       raw.sourceHealth==="PARTIAL"?"CLOUD_SCAN_PARTIAL":"CLOUD_SCAN_FRESH";
     const legacy=(raw.signals||[]).filter(x=>x&&x.id&&
       ["entry","stop","target","netRR"].every(k=>Number.isFinite(x[k]))&&x.netRR>=2).slice(-25);
-    return res.status(200).json({...raw,status,marketState:raw.status,
+    return res.status(200).json({...raw,status,sourceCommit,marketState:raw.status,
       verified:schedulerFresh&&health.cohortMatches&&raw.sourceHealth==="VALID",
       schedulerFresh,cohortMatches:health.cohortMatches,ageMs:health.ageMs,
       archivedReadyPlans:legacy,archivedCount:legacy.length,legacyArchiveOnly:true,

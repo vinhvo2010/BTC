@@ -4,7 +4,7 @@ import handler from "../api/feed.js";
 import { makeScan,updateIndex } from "../lib/journal.js";
 import { payload,transport,res } from "./journal-fixture.mjs";
 async function call(raw){const saved=globalThis.fetch;try{
- globalThis.fetch=async()=>({ok:true,status:200,text:async()=>JSON.stringify(raw)});
+ globalThis.fetch=async input=>({ok:true,status:200,text:async()=>String(input).endsWith(".atom")?"<feed><entry><id>tag:github.com,2008:Grit::Commit/cccccccccccccccccccccccccccccccccccccccc</id></entry></feed>":JSON.stringify(raw)});
  const r=res();await handler({method:"GET"},r);return r.data;
  }finally{globalThis.fetch=saved;}}
 test("stale scheduler remains unverified while retaining complete blocker history",async()=>{
