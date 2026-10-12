@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: '3,18,33,48 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scm15-cloud-scan.yml'
 
 permissions:
   contents: write
