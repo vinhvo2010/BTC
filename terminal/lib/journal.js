@@ -116,7 +116,7 @@ export function updateIndex(previous, scan) {
     sourceHealth:validCount===12?"VALID":validCount?"PARTIAL":"BLOCKED",
     validFrameCount:validCount,frameCount:12,
     status:scan.payload.status,reason:scan.payload.reason??null,
-    scheduler:"GITHUB_ACTIONS_5M_BEST_EFFORT",lastRunId:scan.runId,targetCutoff:scan.targetCutoff,
+    scheduler:"GITHUB_ACTIONS_RESIDENT_5M_V1",lastRunId:scan.runId,targetCutoff:scan.targetCutoff,
     monitoringStartedAt:compatible?previous.monitoringStartedAt:scan.transport.requestedAt,
     cohortChanged:Boolean(previous?.codeHash)&&!compatible,
     preMonitoringHistory:"UNKNOWN_NO_RETROSPECTIVE_DECISIONS",

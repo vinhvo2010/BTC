@@ -35,7 +35,8 @@ if(error) {
 }
 const scan=makeScan(payload,{requestedAt,receivedAt,httpStatus,
   endpoint:endpoint.origin+endpoint.pathname,commitSha:process.env.GITHUB_SHA??null,
-  workflowRunId:process.env.GITHUB_RUN_ID??null,transportError:error});
+  workflowRunId:process.env.GITHUB_RUN_ID??null,transportError:error,
+  timer:process.env.SCM_SCHEDULED_AT?{scheduledAt:Number(process.env.SCM_SCHEDULED_AT),kind:process.env.SCM_TICK_KIND}:null});
 const saved=persistScan(directory,scan);
 console.log(JSON.stringify({runId:scan.runId,at:new Date(receivedAt).toISOString(),
   status:payload.status,sourceHealth:saved.state.sourceHealth,newRecords:saved.newRecords,
