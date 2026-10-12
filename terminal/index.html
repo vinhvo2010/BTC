@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#080f1c"/>
+<meta name="description" content="SCM15 — BTC và ENA trên sáu khung nến đóng. Đánh giá có kiểm tra nguồn và gate rủi ro; không phát hành lệnh khi thiếu bằng chứng." />
+<title>SCM15 — BTC/ENA Research Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+[hidden]{display:none!important}
+.history-filters input,.history-filters select{max-width:100%;background:#101f30;color:#dae7f2;border:1px solid #345067;border-radius:4px;padding:6px}
+.history-filters label{max-width:100%}
+:root {--bg:#080f1c;--surface:#0e1929;--surface2:#121f31;--surface3:#17263a;--line:#25364c;--dim:#7990a6;--white:#e9f0f8;--green:#2dd8ae;--cyan:#5bc7fb;--red:#ff6881;--amber:#ffc06a;--mono:"IBM Plex Mono",monospace;--text:"DM Sans",Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--white);background:radial-gradient(ellipse 80% 20% at 60% -9%,rgba(45,216,174,.11),transparent 80%),var(--bg);font-family:var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}button,input{font:inherit}button{cursor:pointer}
+.topline{height:3px;background:linear-gradient(90deg,#21d0ac,#4a9de8,transparent)}
+.shell{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh}
+.side{border-right:1px solid var(--line);background:rgba(11,20,34,.82);padding:28px 18px;display:flex;flex-direction:column;gap:36px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}.brand-icon{border:1px solid rgba(45,216,174,.4);border-radius:12px;background:rgba(45,216,174,.12);color:var(--green);width:44px;height:44px;display:grid;place-items:center;font:800 17px var(--mono)}.brand-title{font-size:17px;letter-spacing:-.6px;font-weight:800}.brand-title span{color:var(--green)}.brand-sub{font:500 9px var(--mono);color:var(--dim);letter-spacing:1.9px;padding-top:3px}
+.navcap{font:500 10px var(--mono);color:#647f9b;letter-spacing:1.8px;padding:0 16px;margin-bottom:12px}.navlink{display:flex;align-items:center;gap:13px;border-radius:10px;padding:14px 16px;color:#8195a8;font-size:13px;font-weight:700;margin:4px 0;transition:.2s}.navlink.active{background:rgba(45,216,174,.08);color:var(--green);border:1px solid rgba(45,216,174,.15)}.navlink:hover{background:#15273a;color:#dce8ef}.nav-icon{width:18px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:auto;padding:17px;border:1px solid var(--line);border-radius:12px;background:#0c1726}
+.mini-dot{height:8px;width:8px;display:inline-block;border-radius:50%;background:var(--green);box-shadow:0 0 11px var(--green);margin-right:8px}.muted{color:var(--dim)}.tiny{font:11px var(--mono);line-height:1.6}
+.main{min-width:0;padding:28px clamp(18px,3.6vw,58px) 46px;max-width:1820px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:29px;border-bottom:1px solid #203149}
+.eyebrow{font:600 11px var(--mono);letter-spacing:1.8px;color:var(--green)}.time-panel{display:flex;align-items:center;gap:18px;font:12px var(--mono);color:#a8bfd0}.outlinebtn{border:1px solid #314558;background:#142439;color:#cbe4ef;border-radius:8px;font:600 12px var(--text);padding:10px 14px;display:flex;gap:9px;align-items:center;transition:.2s}.outlinebtn:hover{border-color:var(--green);color:var(--green)}.outlinebtn:disabled{opacity:.5;cursor:not-allowed}
+.hero{padding:38px 0 27px}.hero-label{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tag{display:inline-flex;align-items:center;gap:7px;font:600 10px var(--mono);padding:7px 10px;border:1px solid #355169;border-radius:6px;color:#9ec4d8;letter-spacing:.6px}.tag.green{color:var(--green);background:rgba(45,216,174,.08);border-color:rgba(45,216,174,.27)}.tag.amber{color:var(--amber);border-color:#6a5131;background:rgba(255,192,106,.06)}.tag.red{color:var(--red);border-color:rgba(255,104,129,.35);background:rgba(255,104,129,.06)}
+h1{margin:19px 0 7px;font-size:clamp(29px,4vw,51px);line-height:1.13;letter-spacing:-2.2px;font-weight:800}h1 b{color:var(--green)}.lead{color:#9aacbe;font-size:14px;line-height:1.65;margin:0;max-width:790px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:8px 0 19px}.metric{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:21px;min-width:0;position:relative;overflow:hidden}.metric:before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,rgba(45,216,174,.55),transparent)}.metric-label{font:500 11px var(--mono);color:#879bb0;letter-spacing:.2px}.metric-value{font:700 clamp(17px,2vw,27px) var(--mono);letter-spacing:-1px;margin-top:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric-foot{font-size:11px;color:var(--dim);margin-top:8px}.ok{color:var(--green)}.danger{color:var(--red)}.warn{color:var(--amber)}
+.grid{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(325px,1fr);gap:19px;align-items:start}.panel{border:1px solid var(--line);background:var(--surface);border-radius:14px;overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 22px;border-bottom:1px solid var(--line)}.panel-title{font-size:15px;font-weight:800;letter-spacing:-.25px}.panel-sub{font:10px var(--mono);color:var(--dim);margin-top:5px}.panel-body{padding:22px}
+.statusline{display:flex;justify-content:space-between;gap:15px;align-items:center}.statusdot{font:600 11px var(--mono);color:var(--amber)}.chart-wrap{min-height:260px;position:relative;margin:6px 0 12px}.chart{height:290px;width:100%;display:block;overflow:visible}.chart-tip{position:absolute;top:7px;left:12px;padding:8px 11px;border:1px solid #3c5d6f;background:rgba(10,23,37,.94);color:#cceff6;border-radius:7px;font:12px var(--mono);pointer-events:none;display:none}.chart-legend{display:flex;gap:18px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:16px;margin-top:9px;flex-wrap:wrap}.legend{font:11px var(--mono);color:#8fa8b9}.legend b{color:var(--white);font-weight:600}
+.ticket-body{padding:19px 22px 21px}.signal-hero{background:linear-gradient(135deg,#142d32,#132237);border:1px solid #315456;border-radius:10px;padding:15px 17px;margin-bottom:17px}.signal-status{font:800 19px var(--text);letter-spacing:-.5px;margin:8px 0 5px}.signal-desc{font-size:12px;color:#a5b9c7;line-height:1.55}.signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.sig-price{background:#0c1725;border:1px solid #283d4b;border-radius:9px;padding:14px 13px}.sig-price small{font:10px var(--mono);color:var(--dim)}.sig-price strong{display:block;font:600 16px var(--mono);margin-top:9px;letter-spacing:-.6px}.sig-price.big{grid-column:span 2}.rr-card{margin-top:10px;padding:13px 15px;border-radius:9px;background:#112a28;border:1px solid #285248;display:flex;align-items:center;justify-content:space-between}.rr-card strong{font:700 20px var(--mono);color:var(--green)}
+.reasonlist{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.reason{border:1px solid #334459;border-radius:5px;padding:6px 9px;font:10px var(--mono);color:#adbfce;background:#132135}.warning-line{color:var(--dim);font-size:11px;line-height:1.6;padding-top:15px}
+.calc-row{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}.field{display:block}.field label{display:block;color:var(--dim);font:10px var(--mono);margin-bottom:8px}.field input{background:#0b1624;color:var(--white);border:1px solid #31445b;border-radius:7px;padding:11px 12px;outline:none;width:100%;font:12px var(--mono)}.field input:focus{border-color:var(--green)}.size-output{margin-top:13px;background:#111f2f;border:1px solid #263b4d;border-radius:8px;padding:11px;font:11px var(--mono);color:#aec3d3;line-height:1.7}.size-output strong{color:var(--green)}
+.block-note{font-size:11px;line-height:1.6;color:var(--dim);padding:18px 22px;border-top:1px solid var(--line)}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:19px;margin-top:19px}.audit-table{width:100%;border-collapse:collapse}th{text-align:left;font:10px var(--mono);color:#71899e;letter-spacing:.6px;padding:10px 0 13px;border-bottom:1px solid var(--line)}td{padding:13px 0;border-bottom:1px solid #1f3041;font:12px var(--mono);color:#b7c9d5}td:first-child{font-family:var(--text);font-weight:700}tr:last-child td{border:0}.pill{padding:5px 8px;border-radius:5px;background:#163331;color:var(--green);font:10px var(--mono);display:inline-block}.pill.neutral{background:#1d2b3b;color:#9bb5c6}
+.timeline{display:flex;flex-direction:column;gap:13px;max-height:300px;overflow:auto}.event{display:grid;grid-template-columns:5px 1fr;gap:12px}.eventline{border-radius:3px;background:#203648}.eventline.highlight{background:var(--green)}.event-content{border-bottom:1px solid #26364a;padding:0 0 12px}.event-top{display:flex;justify-content:space-between;gap:10px;font:600 12px var(--text)}.event-detail{font:10px var(--mono);line-height:1.8;color:#92aabd;margin-top:4px}
+.frame-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.frame-tab{border:1px solid #365066;background:#132236;color:#aac4d3;border-radius:6px;padding:7px 11px;font:600 11px var(--mono)}.frame-tab.active{border-color:var(--green);color:var(--green);background:#14312d}.zone-list{display:grid;gap:8px;max-height:340px;overflow:auto}.zone-row{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#101f30;font:11px var(--mono);line-height:1.6}.zone-row .zone-head{display:flex;justify-content:space-between;gap:10px;font-weight:700}.zone-note{font:10px var(--mono);color:var(--dim);line-height:1.6;margin-top:9px}.bias-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.bias-cell{border:1px solid var(--line);border-radius:7px;padding:9px;font:10px var(--mono);color:#aec3d3}.footer{display:flex;gap:16px;justify-content:space-between;align-items:center;margin-top:30px;border-top:1px solid var(--line);padding-top:20px;color:var(--dim);font:10px var(--mono);line-height:1.7}.footer a{color:var(--green)}
+.skeleton{height:15px;border-radius:5px;background:linear-gradient(90deg,#183046,#1e3c53,#183046);background-size:200% 100%;animation:pulse 1.7s infinite}@keyframes pulse{from{background-position:200% 0}to{background-position:-200% 0}}
+@media(max-width:1140px){.shell{grid-template-columns:76px 1fr}.side{padding:25px 10px}.brand{padding:0;justify-content:center}.brand .brand-title,.navcap,.navtext,.sidebar-bottom{display:none}.navlink{justify-content:center;padding:15px}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:850px){.grid,.lower{grid-template-columns:1fr}.main{padding:20px 17px 35px}.chart{height:260px}.hero{padding-top:30px}.topbar{padding-bottom:18px}}
+@media(max-width:550px){.shell{display:block}.side{height:61px;padding:10px 17px;border-right:none;border-bottom:1px solid var(--line);flex-direction:row;justify-content:space-between;gap:6px;align-items:center}.brand{justify-content:flex-start}.brand-title{display:block!important}.side nav{display:flex}.navlink{padding:8px;margin:0}.navlink:not(.active){display:none}.time-panel #clock{display:none}.metrics{grid-template-columns:repeat(2,1fr);gap:9px}.metric{padding:15px}.metric-value{font-size:18px}.topbar{align-items:flex-start}.hero h1{letter-spacing:-1.4px}.panel-body,.ticket-body{padding:15px}.panel-head{padding:16px}.chart-wrap{min-height:230px}.chart{height:230px}.footer{flex-direction:column;align-items:flex-start}}
+.symbol-tabs{display:flex;gap:8px;margin-bottom:10px}.symbol-tab{border:1px solid #365066;background:#132236;color:#aac4d3;border-radius:6px;padding:8px 13px;font:700 11px var(--mono)}.symbol-tab.active{border-color:var(--green);color:var(--green);background:#14312d}.frame-matrix{width:100%;border-collapse:collapse}.frame-matrix td,.frame-matrix th{padding:8px 7px;border-bottom:1px solid #203448;text-align:left;font:10px var(--mono)}.frame-matrix td:first-child{font-weight:700}.frame-matrix-wrap{overflow-x:auto}.frame-matrix-note{font:10px var(--mono);color:var(--dim);line-height:1.6;margin-top:10px}
+.bias-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.bias-card{min-width:0;border:1px solid var(--line);border-radius:10px;background:#101e2e;padding:14px}
+.bias-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font:700 12px var(--mono)}
+.bias-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;color:#a8bfce;font:10px var(--mono)}
+.bias-legend span{display:inline-flex;align-items:center;gap:6px}.bias-key{display:inline-block;width:10px;height:10px;border-radius:2px}
+.bias-key.long,.bias-segment.long{background:var(--green)}.bias-key.short,.bias-segment.short{background:var(--red)}.bias-key.neutral,.bias-segment.neutral{background:#5d7185}
+.bias-row{display:grid;grid-template-columns:35px minmax(0,1fr) 129px;align-items:center;gap:9px;width:100%;min-width:0;padding:9px 7px;margin:4px 0;border:1px solid transparent;border-radius:7px;background:#142338;color:var(--white);text-align:left}
+.bias-row:hover,.bias-row:focus-visible{border-color:var(--cyan);outline:none}.bias-row.active{border-color:var(--green);background:#15302e}
+.bias-tf{font:700 11px var(--mono)}.bias-track{display:flex;height:13px;overflow:hidden;background:#263a4b;border-radius:4px}
+.bias-segment{display:block;height:100%;flex:none}.bias-values{font:10px var(--mono);white-space:nowrap;text-align:right}
+.bias-detail{grid-column:2/4;color:#90a9bb;font:10px var(--mono);line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.bias-row.unavailable .bias-values{color:var(--amber)}
+@media(max-width:850px){.bias-grid{grid-template-columns:1fr}}
+@media(max-width:550px){.bias-row{grid-template-columns:35px minmax(0,1fr);gap:7px}.bias-values{grid-column:2;text-align:left}.bias-detail{grid-column:2}}
+.chart-guide{display:flex;gap:13px;flex-wrap:wrap;margin:10px 0 14px;color:#9db5c5;font:10px var(--mono)}
+.chart-guide span{display:inline-flex;gap:5px;align-items:center}.guide-swatch{width:12px;height:8px;display:inline-block;border-radius:1px}
+.guide-swatch.candle-up,.guide-swatch.demand{background:var(--green)}
+.guide-swatch.candle-down{background:var(--red)}
+.guide-swatch.long-level{border-top:2px dashed var(--cyan)}
+.guide-swatch.short-level{border-top:2px dashed var(--red)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}
+.scenario-card{min-width:0;border:1px solid var(--line);border-radius:8px;padding:12px;background:#101f30}
+.scenario-card.long{border-top:2px solid var(--cyan)}.scenario-card.short{border-top:2px solid var(--red)}
+.scenario-card.probability{border-top:2px solid #7b8da0}
+.scenario-label{color:#91a9ba;font:700 10px var(--mono);letter-spacing:.4px}
+.scenario-card strong{display:block;margin:9px 0 6px;font:700 14px var(--mono);overflow-wrap:anywhere}
+.scenario-card.long strong{color:var(--cyan)}.scenario-card.short strong{color:var(--red)}
+.scenario-detail,.scenario-gates{color:#a8bdcc;font:11px var(--mono);line-height:1.6}
+.scenario-gates{border-left:2px solid var(--amber);padding:7px 10px;margin-bottom:10px;background:#182334}
+@media(max-width:550px){.scenario-grid{grid-template-columns:1fr}}
+.scm-signal{margin:0 0 19px}
+.scm-signal-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px}
+.scm-signal-main{min-width:0}
+.scm-signal-context{color:#91a9ba;font:700 11px var(--mono);letter-spacing:.4px}
+.scm-signal-direction{font:800 clamp(24px,3vw,38px) var(--text);letter-spacing:-1.2px;margin:8px 0 4px}
+.scm-signal-direction.long{color:var(--green)}.scm-signal-direction.short{color:var(--red)}
+.scm-signal-direction.mixed{color:var(--amber)}
+.scm-signal-score{font:700 16px var(--mono);color:#dce9f2}
+.scm-signal-score small{font:10px var(--mono);color:var(--dim)}
+.scm-signal-scale{height:10px;margin:17px 0 7px;border-radius:6px;position:relative;background:linear-gradient(90deg,#d75b69 0%,#384350 49%,#384350 51%,#2dd8ae 100%)}
+.scm-signal-marker{position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:#f4f8fb;box-shadow:0 0 0 2px #101b29;left:50%}
+.scm-signal-ticks{display:flex;justify-content:space-between;color:#7f98ab;font:10px var(--mono)}
+.scm-signal-explainer{color:#a8bdcc;font:11px var(--mono);line-height:1.6;margin-top:13px}
+.scm-signal-evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.scm-signal-evidence div{min-width:0;background:#101e2e;border:1px solid #283d4b;border-radius:7px;padding:10px}
+.scm-signal-evidence small{display:block;color:#8fa8ba;font:10px var(--mono);margin-bottom:7px}
+.scm-signal-evidence strong{display:block;font:700 12px var(--mono);overflow-wrap:anywhere}
+.scm-signal-context-line{color:#aec2cf;font:11px var(--mono);line-height:1.6;margin-top:11px}
+.scm-signal-gate{border-left:2px solid var(--amber);background:#1b2735;color:#c4d2db;font:11px var(--mono);line-height:1.6;padding:9px 11px;margin-top:14px}
+@media(max-width:850px){.scm-signal-grid{grid-template-columns:1fr}}
+@media(max-width:550px){.scm-signal-evidence{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="topline"></div>
+<div class="shell">
+<aside class="side">
+  <div class="brand"><div class="brand-icon">S15</div><div><div class="brand-title">SCM<span>15</span></div><div class="brand-sub">RESEARCH TERMINAL</div></div></div>
+  <nav><div class="navcap">WORKSPACE</div>
+    <a class="navlink active" href="#terminal"><span class="nav-icon">◈</span><span class="navtext">Đánh giá thị trường</span></a>
+    <a class="navlink" href="#audit"><span class="nav-icon">▦</span><span class="navtext">Market Gates</span></a>
+    <a class="navlink" href="#history"><span class="nav-icon">◷</span><span class="navtext">Opportunity Log</span></a>
+  </nav>
+  <div class="sidebar-bottom"><div style="font-size:12px;font-weight:800"><span class="mini-dot"></span>Research mode</div><div class="tiny muted" style="padding-top:7px">Binance USD-M public feed<br/>No API keys • No real orders<br/>Sáu khung nến đã đóng</div><div class="tiny muted" id="cloud-health" style="padding-top:12px;border-top:1px solid #294156;margin-top:12px">Cloud worker: chờ heartbeat</div></div>
+</aside>
+<main class="main" id="terminal">
+  <div class="topbar">
+    <div><div class="eyebrow">SCMV3 / INDEPENDENT RESEARCH SYSTEM</div><div class="tiny muted" style="margin-top:7px">BTC → BTC.D → ENA · Native 15m/H1/H4/D1/1w/1M · LAST close · UTC+7</div></div>
+    <div class="time-panel"><span id="clock">--:--:-- ICT</span><button id="refresh" class="outlinebtn"><span>↻</span><span id="refresh-text">Refresh data</span></button></div>
+  </div>
+  <section class="hero">
+    <div class="hero-label"><span class="tag green">● PUBLIC BINANCE DATA</span><span class="tag">SIX NATIVE TIMEFRAMES</span><span class="tag amber">SHADOW · NO REAL ORDERS</span><span class="tag">PAPER LEDGER · CHƯA KẾT NỐI TRANG</span></div>
+    <h1>BTC → BTC.D → ENA.<br/><b>Đánh giá sáu khung nến đóng.</b></h1>
+    <p class="lead">Mỗi lần quét trả đánh giá cho nến đã đóng ở sáu khung của BTC và ENA. WATCH/WAIT là quan sát, không phải lệnh. Chưa xác minh equity, rủi ro mở và chi phí thực nên entry, SL, TP, size và R:R dùng để ra lệnh được giữ trống.</p>
+  </section>
+  <section class="metrics" aria-label="Live market overview">
+    <div class="metric"><div class="metric-label">ENAUSDT / CLOSED 15M</div><div class="metric-value" id="ena-price">—</div><div class="metric-foot" id="ena-foot">Đang đọc Binance Futures</div></div>
+    <div class="metric"><div class="metric-label">BTCUSDT / CLOSED 1H</div><div class="metric-value" id="btc-price">—</div><div class="metric-foot" id="btc-foot">BTC 4H gate: chưa xác định</div></div>
+    <div class="metric"><div class="metric-label">SIGNAL ENGINE</div><div class="metric-value" id="market-status">CONNECTING</div><div class="metric-foot" id="market-foot">Chỉ khi chứng cứ đầy đủ</div></div>
+    <div class="metric"><div class="metric-label">NEXT 15M CLOSE</div><div class="metric-value" id="countdown">--:--</div><div class="metric-foot">Tự quét trang mỗi 45 giây</div></div>
+  </section>
+  <section class="panel scm-signal" id="signal-overview" aria-label="SCM Signal theo khung đang chọn">
+    <div class="panel-head"><div><div class="panel-title">SCM SIGNAL · TREND IS FRIEND</div><div class="panel-sub">Hướng quan sát từ nến đóng; không thay thế gate giao dịch</div></div><span class="tag amber" id="signal-permission">ĐANG KIỂM TRA</span></div>
+    <div class="panel-body">
+      <div class="scm-signal-grid">
+        <div class="scm-signal-main">
+          <div class="scm-signal-context" id="signal-context">ENAUSDT · 15m · đang tải</div>
+          <div class="scm-signal-direction mixed" id="signal-direction">CHƯA CÓ TÍN HIỆU</div>
+          <div class="scm-signal-score"><span id="signal-score">—</span> <small>/ 100 · điểm hướng bằng chứng</small></div>
+          <div class="scm-signal-scale" role="img" aria-label="Điểm hướng từ Short âm 100 đến Long dương 100"><span class="scm-signal-marker" id="signal-marker"></span></div>
+          <div class="scm-signal-ticks"><span>SHORT −100</span><span>TRUNG LẬP 0</span><span>LONG +100</span></div>
+          <div class="scm-signal-explainer" id="signal-explainer">Đang kiểm tra cấu trúc, phá biên và áp lực giao dịch.</div>
+        </div>
+        <div>
+          <div class="scm-signal-evidence">
+            <div><small>Xu hướng D1</small><strong id="signal-trend-d1">—</strong></div>
+            <div><small>Xu hướng H4</small><strong id="signal-trend-h4">—</strong></div>
+            <div><small>Xác nhận H1</small><strong id="signal-trend-h1">—</strong></div>
+            <div><small>Taker-buy / khung</small><strong id="signal-taker">—</strong></div>
+            <div><small>Delta / RVOL</small><strong id="signal-flow">—</strong></div>
+            <div><small>BTC.D / BTC H4</small><strong id="signal-btc">—</strong></div>
+          </div>
+          <div class="scm-signal-context-line">Volume, taker-buy và delta của futures là proxy áp lực giao dịch cùng cửa sổ; không đo dòng tiền mua ròng. BTC.D là thị phần vốn hóa, không phải dòng tiền.</div>
+        </div>
+      </div>
+      <div class="scm-signal-gate" id="signal-gate">Đang đánh giá dữ liệu và điều kiện giao dịch.</div>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="panel" aria-label="ENA chart">
+      <div class="panel-head"><div><div class="panel-title"><span id="selected-symbol-tag">ENA / USDT</span> <span class="tag green" id="selected-frame-tag" style="margin-left:8px">15m</span></div><div class="panel-sub">Binance USD-M Futures · Chỉ dùng nến đã đóng</div></div><div class="statusdot" id="chart-status">● INITIALIZING</div></div>
+      <div class="panel-body">
+        <div class="symbol-tabs" aria-label="Cặp tiền"><button class="symbol-tab" data-symbol="BTCUSDT">BTC / USDT</button><button class="symbol-tab active" data-symbol="ENAUSDT">ENA / USDT</button></div><div class="frame-tabs" aria-label="Khung thời gian"><button class="frame-tab active" data-frame="15m">15m</button><button class="frame-tab" data-frame="1h">1H</button><button class="frame-tab" data-frame="4h">4H</button><button class="frame-tab" data-frame="1d">D1</button><button class="frame-tab" data-frame="1w">1w</button><button class="frame-tab" data-frame="1M">1M</button></div>
+        <div class="chart-wrap"><svg id="chart" class="chart" viewBox="0 0 800 290" role="img" aria-label="ENA USDT 15 minute closing prices"><text x="400" y="140" text-anchor="middle" fill="#728ca3" font-size="15">Đang đồng bộ dữ liệu...</text></svg><div class="chart-tip" id="chart-tip"></div></div>
+        <div class="chart-legend"><div class="legend">CUT OFF <b id="cutoff">—</b></div><div class="legend">ATR14 15m <b id="atr">—</b></div><div class="legend">QUALITY <b id="quality">NOT_RUN</b></div></div>
+        <div class="chart-guide"><span><i class="guide-swatch candle-up"></i>Nến tăng</span><span><i class="guide-swatch candle-down"></i>Nến giảm / vùng cung</span><span><i class="guide-swatch demand"></i>Vùng cầu</span><span><i class="guide-swatch long-level"></i>Biên chờ Long</span><span><i class="guide-swatch short-level"></i>Biên chờ Short</span></div>
+        <div class="scenario-grid" aria-live="polite"><div class="scenario-card long"><div class="scenario-label">CHỜ MUA · LONG</div><strong id="scenario-long-price">—</strong><div id="scenario-long-detail" class="scenario-detail">Đang kiểm tra nến đóng.</div></div><div class="scenario-card short"><div class="scenario-label">CHỜ BÁN · SHORT</div><strong id="scenario-short-price">—</strong><div id="scenario-short-detail" class="scenario-detail">Đang kiểm tra nến đóng.</div></div><div class="scenario-card probability"><div class="scenario-label">XÁC SUẤT THẮNG</div><strong id="scenario-probability">Chưa hiệu chuẩn</strong><div class="scenario-detail">Bias và áp lực phá vùng là quan sát, không phải xác suất.</div></div></div>
+        <div id="scenario-gates" class="scenario-gates">Chưa có đánh giá khung đang chọn.</div>
+        <div class="zone-note">Vùng Cung/Cầu là quan sát pivot wick trên nến đã đóng; trạng thái BROKEN giữ nguyên. Áp lực phá vùng là định tính, không phải xác suất thắng.</div>
+        <div class="zone-list" id="zone-list" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="panel" aria-label="Research trade ticket">
+      <div class="panel-head"><div><div class="panel-title">Trade Plan</div><div class="panel-sub">Entry, stop, target và R:R chỉ có khi đủ gate</div></div><span class="tag amber" id="ticket-tag">NO TRADE</span></div>
+      <div class="ticket-body">
+        <div class="signal-hero"><div class="eyebrow" id="plan-label">AWAITING VERIFIED SETUP</div><div class="signal-status" id="plan-title">Đang kiểm tra điều kiện</div><div class="signal-desc" id="plan-description">Không xuất lệnh trước khi đủ dữ liệu nến đóng và điểm vô hiệu.</div></div>
+        <div class="signal-grid">
+          <div class="sig-price big"><small>ENTRY · Lệnh giới hạn trên retest</small><strong id="entry">—</strong></div>
+          <div class="sig-price"><small>STOP LOSS</small><strong id="stop" class="danger">—</strong></div>
+          <div class="sig-price"><small>TAKE PROFIT</small><strong id="target" class="ok">—</strong></div>
+        </div>
+        <div class="rr-card"><div><div class="metric-label">NET RISK / REWARD</div><div class="tiny muted">Chi phí thực chưa xác minh</div></div><strong id="rr">—</strong></div>
+        <div class="reasonlist" id="reasons"><span class="reason">Đang tải chứng cứ</span></div>
+        <button id="copy" class="outlinebtn" disabled style="width:100%;justify-content:center;margin-top:16px">⧉ Sao chép kế hoạch giao dịch</button>
+        <div class="warning-line">Kế hoạch nghiên cứu, không phải lệnh đã gửi sàn. Entry chỉ được phép sử dụng sau xác nhận retest 5m và mọi cổng dữ liệu.</div>
+      </div>
+      <div class="block-note"><div class="panel-title" style="font-size:12px;margin-bottom:13px">Risk sizing · thủ công</div>
+        <div class="tiny muted">Không nhập thông tin tài khoản vào trang công khai. Size chỉ được tính khi equity, rủi ro mở và chi phí có nguồn xác minh cùng thời điểm.</div>
+        <div class="size-output" id="position-size">Chưa có tín hiệu READY hoặc vốn hợp lệ. Không tự giả định số dư tài khoản.</div>
+      </div>
+    </section>
+  </div>
+  <section class="panel" id="bias" style="margin-top:19px"><div class="panel-head"><div><div class="panel-title">Long / Short Bias · từng khung</div><div class="panel-sub">BTC và ENA · nến đóng 15m / 1h / 4h / 1D / 1w / 1M</div></div><span class="tag" id="bias-lean">—</span></div><div class="panel-body"><div id="bias-summary" class="tiny muted">Đang tải nến đóng...</div><div class="bias-legend"><span><i class="bias-key long"></i>Long</span><span><i class="bias-key short"></i>Short</span><span><i class="bias-key neutral"></i>Trung lập / chưa rõ</span></div><div id="bias-frames" class="bias-grid" aria-live="polite"></div><div class="frame-matrix-note">Mỗi thanh là tỷ trọng của ba quan sát: cấu trúc pivot đã xác nhận, phá biên 20 nến đóng và tỷ lệ taker-buy cùng nến. Không phải xác suất thắng, khuyến nghị hay quyền giao dịch. Nguồn thiếu/xung đột giữ thanh trống.</div></div></section>
+  <section class="panel" id="multiframe" style="margin-top:19px"><div class="panel-head"><div><div class="panel-title">BTC → ENA · Đánh giá nến đóng đa khung</div><div class="panel-sub">15m / 1h / 4h / 1D / 1w / 1M · mỗi lần gọi API, không phải lịch sử bền vững</div></div></div><div class="panel-body"><div class="frame-matrix-wrap"><table class="frame-matrix"><thead><tr><th>Cặp</th><th>Khung</th><th>Close</th><th>Cấu trúc</th><th>Khối lượng / RVOL</th><th>Đánh giá</th><th>Giao dịch</th><th>Lý do / gate</th></tr></thead><tbody id="frame-assessments"></tbody></table></div><div class="frame-matrix-note">Thiếu nến, trùng/gap, warm-up hoặc receipt phải hiện lý do. Không suy diễn tỷ lệ Long/Short thành xác suất thắng; không tạo Paper fill trên website.</div></div></section>
+  <section class="lower">
+    <div class="panel" id="audit"><div class="panel-head"><div><div class="panel-title">Evidence & Market Gates</div><div class="panel-sub">Mỗi điều kiện có lý do · không ép lệnh Long/Short</div></div></div><div class="panel-body"><table class="audit-table"><tbody id="audit-body"><tr><td>Binance Market</td><td>—</td><td>WAIT</td></tr></tbody></table></div></div>
+    <div class="panel" id="history"><div class="panel-head"><div><div class="panel-title">Nhật ký quyết định · SHADOW</div><div class="panel-sub">BTC / ENA · sáu khung · lưu cả WAIT và lý do chặn</div></div></div><div class="panel-body">
+<div class="history-filters" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+<label class="tiny">Ngày lưu UTC <input id="history-date" type="date" aria-label="Ngày nhật ký UTC"></label>
+<select id="history-symbol" aria-label="Cặp nhật ký"><option value="">BTC &amp; ENA</option><option value="BTCUSDT">BTCUSDT</option><option value="ENAUSDT">ENAUSDT</option></select>
+<select id="history-frame" aria-label="Khung nhật ký"><option value="">Tất cả khung</option><option>15m</option><option>1h</option><option>4h</option><option>1d</option><option>1w</option><option>1M</option></select>
+</div><div id="history-health" class="tiny muted" role="status">Đang đọc receipt cloud...</div>
+<div class="tiny muted" style="margin:8px 0">Giờ hiển thị Việt Nam. Bản đọc muộn và nến bị bỏ lỡ được đánh dấu; không tái dựng tín hiệu đã phát.</div>
+<div class="timeline" id="events"><div class="tiny muted">Đang đọc quyết định đã lưu...</div></div>
+<button id="history-more" class="outlinebtn" hidden style="margin-top:12px">Xem quyết định cũ hơn</button>
+</div></div>
+  </section>
+  <div class="footer"><div>SCM15 MULTIFRAME RESEARCH V3 · Binance USD-M public data · No trading API permissions · No guaranteed edge</div><div><span id="last-sync">No synchronized decision</span> · <span id="cloud-foot">Cloud heartbeat: pending</span> · <a href="https://www.binance.com/en/futures/ENAUSDT" target="_blank" rel="noopener noreferrer">Binance ENA ↗</a></div></div>
+</main></div>
+<script type="module">
+const $=id=>document.getElementById(id);
+let current=null;let loading=false;let cloudHistory=[];let selectedFrame="15m";let selectedSymbol="ENAUSDT";
+let historyRecords=[],historyCursor=null,historyRequest=0,historyStatus="Đang đọc nhật ký...";
+$("history-date").value=new Date().toISOString().slice(0,10);
+const formatNumber=(v,d=5)=>typeof v==="number"?v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
+const when=t=>t?new Date(t).toLocaleString("vi-VN",{timeZone:"Asia/Ho_Chi_Minh",hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",hour12:false}):"—";
+const pct=(v)=>typeof v==="number"?formatNumber(v,2)+"%":"—";
+function clock(){
+  const now=new Date();
+  $("clock").textContent=now.toLocaleTimeString("en-GB",{timeZone:"Asia/Ho_Chi_Minh",hour12:false})+" ICT";
+  const remain=(900000-(Date.now()%900000))/1000;
+  $("countdown").textContent=String(Math.floor(remain/60)).padStart(2,"0")+":"+String(Math.floor(remain%60)).padStart(2,"0");
+}
+function node(name,attributes={}){
+  const e=document.createElementNS("http://www.w3.org/2000/svg",name);
+  Object.entries(attributes).forEach(([k,v])=>e.setAttribute(k,String(v)));
+  return e;
+}
+function chart(bars,zones=[],symbol="ENAUSDT",assessment=null){
+  const svg=$("chart");svg.replaceChildren();
+  if(!bars || bars.length<2){
+    const t=node("text",{x:400,y:145,"text-anchor":"middle",fill:"#8097aa","font-size":14});
+    t.textContent="Chưa có nến hợp lệ";svg.append(t);return;
+  }
+  const min=Math.min(...bars.map(x=>x.l)),max=Math.max(...bars.map(x=>x.h));
+  const pad=Math.max((max-min)*.13,Math.abs(max)*.002);
+  const bottom=min-pad,top=max+pad, W=800,H=290,left=61,right=20,yt=17,yb=212;
+  const xx=i=>left+i*(W-left-right)/(bars.length-1);
+  const yy=v=>yt+(top-v)*(yb-yt)/(top-bottom);
+  for(let j=0;j<5;j++){
+    const value=bottom+(top-bottom)*(1-j/4),y=yy(value);
+    svg.append(node("line",{x1:left,y1:y,x2:W-right,y2:y,stroke:"#213449","stroke-width":1,"stroke-dasharray":"3 7"}));
+    const label=node("text",{x:0,y:y+4,fill:"#7691a7","font-size":12,"font-family":"IBM Plex Mono, monospace"});
+    label.textContent=formatNumber(value,symbol==="BTCUSDT"?1:5);svg.append(label);
+  }
+  const visibleZones=zones.filter(z=>z.state==="ACTIVE"&&z.upper>=bottom&&z.lower<=top)
+    .sort((a,b)=>Math.abs((a.lower+a.upper)/2-bars.at(-1).c)-
+      Math.abs((b.lower+b.upper)/2-bars.at(-1).c)).slice(0,4);
+  for(const z of visibleZones){
+    const yTop=yy(Math.min(z.upper,top)),yBottom=yy(Math.max(z.lower,bottom));
+    const color=z.kind==="SUPPLY"?"#ff6881":"#2dd8ae";
+    svg.append(node("rect",{x:left,y:yTop,width:W-left-right,height:Math.max(2,yBottom-yTop),
+      fill:color,"fill-opacity":".13",stroke:color,"stroke-opacity":".45"}));
+    const label=node("text",{x:left+5,y:Math.max(yt+11,Math.min(yb-4,yTop+11)),fill:color,
+      "font-size":10,"font-family":"IBM Plex Mono, monospace"});
+    label.textContent=(z.kind==="SUPPLY"?"CUNG":"CẦU")+" "+formatNumber(z.lower,symbol==="BTCUSDT"?1:5)+
+      "–"+formatNumber(z.upper,symbol==="BTCUSDT"?1:5);
+    svg.append(label);
+  }
+  const maxVolume=Math.max(...bars.map(b=>b.v),1);
+  bars.forEach((b,i)=>svg.append(node("rect",{x:xx(i)-2.5,y:251-34*b.v/maxVolume,
+    width:5,height:34*b.v/maxVolume,fill:b.buy>b.v/2?"#2dd8ae":"#ff6881","fill-opacity":".55"})));
+  const bodyWidth=Math.max(3,Math.min(7,(W-left-right)/bars.length*.65));
+  bars.forEach((b,i)=>{
+    const color=b.c>=b.o?"#2dd8ae":"#ff6881",x=xx(i);
+    svg.append(node("line",{x1:x,y1:yy(b.h),x2:x,y2:yy(b.l),stroke:color,"stroke-width":1.3}));
+    svg.append(node("rect",{x:x-bodyWidth/2,y:Math.min(yy(b.o),yy(b.c)),width:bodyWidth,
+      height:Math.max(2,Math.abs(yy(b.o)-yy(b.c))),fill:color}));
+  });
+  const last=bars[bars.length-1],lastY=yy(last.c);
+  svg.append(node("line",{x1:left,y1:lastY,x2:W-right,y2:lastY,stroke:"#2dd8ae","stroke-width":1,"stroke-dasharray":"5 5","stroke-opacity":".35"}));
+  svg.append(node("circle",{cx:xx(bars.length-1),cy:lastY,r:4,fill:"#e9f0f8",stroke:"#0e1929","stroke-width":2}));
+  if(assessment?.audit?.status==="VALID"&&assessment.scenarios){
+    const guides=[["LONG",assessment.scenarios.long?.triggerAbove,"#5bc7fb",">"],
+      ["SHORT",assessment.scenarios.short?.triggerBelow,"#ff6881","<"]];
+    const used=[];
+    for(const [side,price,color,sign] of guides){
+      if(typeof price!=="number"||price<bottom||price>top)continue;
+      const y=yy(price);
+      svg.append(node("line",{x1:left,y1:y,x2:W-right,y2:y,stroke:color,
+        "stroke-width":1.4,"stroke-dasharray":"6 5","data-guide":side}));
+      let labelY=Math.max(yt+2,Math.min(yb-16,y-9));
+      if(used.some(other=>Math.abs(other-labelY)<20))labelY=Math.max(yt+2,Math.min(yb-16,labelY+21));
+      used.push(labelY);
+      svg.append(node("rect",{x:W-152,y:labelY,width:132,height:17,rx:3,fill:"#0e1929",
+        stroke:color,"stroke-opacity":".7"}));
+      const label=node("text",{x:W-147,y:labelY+12,fill:color,"font-size":10,
+        "font-family":"IBM Plex Mono, monospace"});
+      label.textContent=side+" "+sign+" "+formatNumber(price,symbol==="BTCUSDT"?1:5);
+      svg.append(label);
+    }
+  }
+  for(const i of [0,Math.floor((bars.length-1)/3),Math.floor(2*(bars.length-1)/3),bars.length-1]){
+    const label=node("text",{x:xx(i),y:284,"text-anchor":"middle",fill:"#7795aa","font-size":11,"font-family":"IBM Plex Mono, monospace"});
+    label.textContent=when(bars[i].t);svg.append(label);
+  }
+  svg.onmousemove=ev=>{
+    const b=svg.getBoundingClientRect(),relative=(ev.clientX-b.left)/b.width*800;
+    const i=Math.max(0,Math.min(bars.length-1,Math.round((relative-left)*(bars.length-1)/(W-left-right))));
+    $("chart-tip").textContent=when(bars[i].t)+" · Close "+formatNumber(bars[i].c,5)+" USDT · Vol "+formatNumber(bars[i].v,0)+" "+symbol.replace("USDT","")+" · Taker buy "+formatNumber(bars[i].buy,0);
+    $("chart-tip").style.display="block";
+  };
+  svg.onmouseleave=()=>{$("chart-tip").style.display="none"};
+}
+function renderZones(d){
+  const list=$("zone-list");list.replaceChildren();
+  const zones=(d.zonesBySymbol?.[selectedSymbol]?.[selectedFrame]|| (selectedSymbol==="ENAUSDT"?d.zones?.[selectedFrame]:[])||[]).slice().reverse();
+  if(!zones.length){list.textContent="Chưa có vùng pivot đủ nến xác nhận ở khung này.";return;}
+  for(const z of zones){
+    const row=document.createElement("div");row.className="zone-row";
+    const head=document.createElement("div");head.className="zone-head";
+    const title=document.createElement("span");title.textContent=z.kind+" · "+formatNumber(z.lower,5)+"–"+formatNumber(z.upper,5)+" USDT";
+    title.className=z.kind==="SUPPLY"?"danger":"ok";
+    const state=document.createElement("span");state.textContent=z.state+" · "+(z.breakPressure?.level||"UNKNOWN");
+    head.append(title,state);row.append(head);
+    const detail=document.createElement("div");detail.className="zone-note";
+    detail.textContent=z.formation+" · origin "+when(z.originAt)+" · known "+when(z.knownAt)+
+      " · ATR0 "+formatNumber(z.atrLocked,6)+" · retest "+z.retests+
+      " · volume "+formatNumber(z.volume.origin,0)+" "+selectedSymbol.replace("USDT","")+" · buy "+formatNumber(z.volume.takerBuy,0)+
+      " · sell "+formatNumber(z.volume.takerSell,0)+" · Δ "+formatNumber(z.volume.takerDelta,0)+
+      " · RVOL "+formatNumber(z.volume.relative,2)+" · break: "+(z.breakPressure?.reasons||[]).join(", ");
+    row.append(detail);list.append(row);
+  }
+}
+function renderBias(d){
+  const aggregate=d.biasBySymbol?.[selectedSymbol]||d.bias;
+  $("bias-lean").textContent=selectedSymbol.replace("USDT","")+" · "+(aggregate?.leaning||"UNKNOWN");
+  $("bias-summary").textContent=aggregate?
+    selectedSymbol.replace("USDT","")+" · tổng hợp cấu trúc sáu khung: Long "+pct(aggregate.longEvidencePct)+
+    " / Short "+pct(aggregate.shortEvidencePct)+" · độ phủ hướng "+pct(aggregate.directionalCoveragePct):
+    "Chưa có đủ cấu trúc đa khung để tổng hợp.";
+  const box=$("bias-frames");box.replaceChildren();
+  for(const symbol of ["BTCUSDT","ENAUSDT"]){
+    const card=document.createElement("section");card.className="bias-card";
+    const head=document.createElement("div");head.className="bias-card-head";
+    const name=document.createElement("span");name.textContent=symbol.replace("USDT"," / USDT");
+    const source=document.createElement("span");source.className="muted";source.textContent="Binance USD-M · nến đóng";
+    head.append(name,source);card.append(head);
+    for(const tf of ["15m","1h","4h","1d","1w","1M"]){
+      const a=d.assessments?.[symbol]?.[tf],b=d.frameBiasBySymbol?.[symbol]?.[tf];
+      const valid=b?.status==="VALID"&&typeof b.longEvidencePct==="number"&&
+        typeof b.shortEvidencePct==="number"&&typeof b.neutralEvidencePct==="number";
+      const row=document.createElement("button");row.type="button";
+      row.className="bias-row"+(valid?"":" unavailable")+
+        (symbol===selectedSymbol&&tf===selectedFrame?" active":"");
+      row.dataset.symbol=symbol;row.dataset.frame=tf;
+      const label=document.createElement("span");label.className="bias-tf";label.textContent=tf;
+      const track=document.createElement("span");track.className="bias-track";
+      const values=document.createElement("span");values.className="bias-values";
+      const detail=document.createElement("span");detail.className="bias-detail";
+      if(valid){
+        for(const [kind,value] of [["long",b.longEvidencePct],["neutral",b.neutralEvidencePct],["short",b.shortEvidencePct]]){
+          const part=document.createElement("span");part.className="bias-segment "+kind;
+          part.style.width=value+"%";track.append(part);
+        }
+        const numbers="L "+formatNumber(b.longEvidencePct,1)+"% · S "+formatNumber(b.shortEvidencePct,1)+"%";
+        values.textContent=numbers;
+        track.setAttribute("role","img");
+        track.setAttribute("aria-label",numbers+" · trung lập "+formatNumber(b.neutralEvidencePct,1)+"%");
+        detail.textContent=(a?.structure||"UNKNOWN")+" · phá biên "+(a?.breakout||"không")+
+          " · taker-buy "+pct(b.basis?.takerBuySharePct)+
+          " · độ phủ "+pct(b.coveragePct);
+        row.title="Nến đóng "+when(a?.closedAt)+" · "+detail.textContent+
+          " · trung lập "+pct(b.neutralEvidencePct)+" · không phải xác suất thắng";
+        row.setAttribute("aria-label",symbol+" "+tf+" "+numbers+
+          " trung lập "+pct(b.neutralEvidencePct)+"; xem biểu đồ");
+      }else{
+        const part=document.createElement("span");part.className="bias-segment neutral";
+        part.style.width="100%";track.append(part);
+        values.textContent="NULL · nguồn chưa đủ";
+        detail.textContent=(b?.reasons||a?.audit?.reasons||["SOURCE_UNAVAILABLE"]).join(" · ");
+        row.title=detail.textContent;
+        row.setAttribute("aria-label",symbol+" "+tf+" không đủ dữ liệu; xem biểu đồ");
+      }
+      row.addEventListener("click",()=>{
+        selectedSymbol=symbol;selectedFrame=tf;renderBias(d);drawFrame();
+      });
+      row.append(label,track,values,detail);card.append(row);
+    }
+    box.append(card);
+  }
+}
+function renderScenario(a){
+  $("scenario-probability").textContent="Chưa hiệu chuẩn";
+  if(!a||a.audit?.status!=="VALID"||!a.scenarios){
+    $("scenario-long-price").textContent="—";$("scenario-short-price").textContent="—";
+    $("scenario-long-detail").textContent="Thiếu dữ liệu nến đóng hợp lệ; chưa có mốc quan sát.";
+    $("scenario-short-detail").textContent="Thiếu dữ liệu nến đóng hợp lệ; chưa có mốc quan sát.";
+    $("scenario-gates").textContent="DATA_INCOMPLETE · "+
+      (a?.audit?.reasons||["SOURCE_UNAVAILABLE"]).join(" · ")+" · Không phát hành lệnh.";
+    return;
+  }
+  const digits=a.symbol==="BTCUSDT"?1:5;
+  const long=a.scenarios.long,short=a.scenarios.short;
+  $("scenario-long-price").textContent=typeof long?.triggerAbove==="number"?
+    "Nến đóng > "+formatNumber(long.triggerAbove,digits)+" USDT":"—";
+  $("scenario-short-price").textContent=typeof short?.triggerBelow==="number"?
+    "Nến đóng < "+formatNumber(short.triggerBelow,digits)+" USDT":"—";
+  $("scenario-long-detail").textContent=(a.breakout==="LONG"?
+    "Đã vượt biên; tiếp tục chờ xác nhận và retest. ":"Chờ xác nhận phá biên. ")+
+    "Kịch bản bác bỏ dưới "+formatNumber(long?.invalidationBelow,digits)+
+    " USDT. Đây không phải stop loss.";
+  $("scenario-short-detail").textContent=(a.breakout==="SHORT"?
+    "Đã thủng biên; tiếp tục chờ xác nhận và retest. ":"Chờ xác nhận thủng biên. ")+
+    "Kịch bản bác bỏ trên "+formatNumber(short?.invalidationAbove,digits)+
+    " USDT. Đây không phải stop loss.";
+  $("scenario-gates").textContent=a.symbol+" "+a.timeframe+" · "+a.state+
+    " · nến đóng "+when(a.closedAt)+" · giao dịch "+a.tradePermission+
+    " · "+[...a.reasons,...a.blockedBy].slice(0,6).join(" · ");
+}
+function renderSignalOverview(d,a){
+  const card=$("signal-overview"),b=d?.frameBiasBySymbol?.[selectedSymbol]?.[selectedFrame];
+  const valid=a?.audit?.status==="VALID"&&b?.status==="VALID"&&
+    typeof b.longEvidencePct==="number"&&typeof b.shortEvidencePct==="number";
+  const direction=valid?b.leaning:"DATA_INCOMPLETE";
+  const labels={LONG:"LONG BIAS · CHỜ MUA",SHORT:"SHORT BIAS · CHỜ BÁN",
+    MIXED:"MÂU THUẪN · ĐỨNG NGOÀI",UNDETERMINED:"CHƯA RÕ HƯỚNG · CHỜ",
+    DATA_INCOMPLETE:"THIẾU DỮ LIỆU · CHỜ"};
+  card.dataset.state=direction;
+  $("signal-context").textContent=selectedSymbol+" · "+selectedFrame+
+    " · nến đóng "+when(a?.closedAt)+" ICT · độ phủ "+
+    (valid?pct(b.coveragePct):"NULL");
+  $("signal-direction").textContent=labels[direction]||labels.UNDETERMINED;
+  $("signal-direction").className="scm-signal-direction "+
+    (direction==="LONG"?"long":direction==="SHORT"?"short":"mixed");
+  $("signal-permission").textContent=valid?(a.tradePermission||"NO_TRADE"):"DATA_INCOMPLETE";
+  $("signal-permission").className="tag "+(valid?"amber":"danger");
+  const score=valid?Math.round((b.longEvidencePct-b.shortEvidencePct)*10)/10:null;
+  $("signal-score").textContent=score===null?"—":(score>0?"+":"")+formatNumber(score,1);
+  $("signal-marker").style.left=score===null?"50%":Math.max(0,Math.min(100,(score+100)/2))+"%";
+  $("signal-marker").style.visibility=score===null?"hidden":"visible";
+  const trends=["1d","4h","1h"].map(tf=>{
+    const item=d?.assessments?.[selectedSymbol]?.[tf];
+    return item?.audit?.status==="VALID"?item.structure:null;
+  });
+  const translated=s=>s==="UP"?"TĂNG":s==="DOWN"?"GIẢM":
+    s==="MIXED"?"GIẰNG CO":s==="UNKNOWN"?"CHƯA RÕ":"NULL";
+  ["signal-trend-d1","signal-trend-h4","signal-trend-h1"].forEach((id,i)=>
+    $(id).textContent=translated(trends[i]));
+  const sameTrend=trends.every(t=>t==="UP")?"UP":trends.every(t=>t==="DOWN")?"DOWN":null;
+  const trendText=sameTrend?
+    "D1/H4/H1 đồng pha "+translated(sameTrend).toLowerCase():
+    trends.some(t=>t===null)?"Thiếu bối cảnh D1/H4/H1":"D1/H4/H1 chưa đồng pha";
+  const vol=valid?a.volume:null,share=vol?.takerBuySharePct;
+  $("signal-taker").textContent=typeof share==="number"?
+    formatNumber(share,2)+"% · "+formatNumber(vol.volumeBase,0)+" "+selectedSymbol.replace("USDT",""):
+    "NULL";
+  $("signal-taker").title="Taker-buy share và tổng khối lượng futures của chính khung "+selectedFrame;
+  const delta=vol?.takerDeltaBase,rvol=vol?.rvol;
+  $("signal-flow").textContent=typeof delta==="number"&&typeof rvol==="number"?
+    "Δ "+(delta>0?"+":"")+formatNumber(delta,0)+" · RVOL "+formatNumber(rvol,2):"NULL";
+  $("signal-flow").title="Taker-buy trừ taker-sell; RVOL so với 20 nến trước cùng khung. Không đo dòng tiền mua ròng.";
+  const btcH4=d?.assessments?.BTCUSDT?.["4h"];
+  const btcTrend=btcH4?.audit?.status==="VALID"?translated(btcH4.structure):"NULL";
+  const btcD=d?.btcDominance,decisionAt=a?.decisionAt??d?.runAt;
+  const btcDValid=btcD?.status==="VALID"&&typeof btcD.valuePct==="number"&&
+    Number.isFinite(btcD.asOf)&&Number.isFinite(btcD.receivedAt)&&
+    Number.isFinite(decisionAt)&&btcD.asOf<=decisionAt&&btcD.receivedAt<=decisionAt;
+  $("signal-btc").textContent=(btcDValid?formatNumber(btcD.valuePct,2)+"%":"NULL")+
+    " · "+btcTrend;
+  $("signal-btc").title=btcDValid?
+    (btcD.definition||"BTC market-cap dominance")+" · "+when(btcD.asOf)+" ICT":
+    "BTC.D thiếu, đến muộn hoặc chưa có thời điểm nguồn hợp lệ";
+  $("signal-explainer").textContent=!valid?
+    "Nguồn nến thiếu/xung đột hoặc đến sau quyết định; không tính điểm hướng.":
+    direction==="MIXED"?"Cấu trúc pivot và phá biên đối nghịch. "+trendText+". Chờ đồng thuận.":
+    direction==="UNDETERMINED"?"Chưa có hướng đủ rõ ở khung chọn. "+trendText+". Chờ nến đóng mới.":
+    "Khung chọn nghiêng "+(direction==="LONG"?"Long":"Short")+
+    " theo ba quan sát. "+trendText+". Điểm hướng không phải xác suất thắng.";
+  const reasons=!valid?(a?.audit?.reasons||b?.reasons||["SOURCE_UNAVAILABLE"]):
+    [...(a.reasons||[]),...(a.blockedBy||[])];
+  $("signal-gate").textContent=(valid?
+    a.state+" · giao dịch "+(a.tradePermission||"NO_TRADE"):
+    "DATA_INCOMPLETE · NO_TRADE")+" · "+
+    (reasons.length?reasons.slice(0,5).join(" · "):"Chờ setup và kiểm tra rủi ro")+
+    " · Không đặt lệnh từ thẻ Signal.";
+}
+function drawFrame(){
+  $("selected-frame-tag").textContent=selectedFrame;$("selected-symbol-tag").textContent=selectedSymbol.replace("USDT"," / USDT");
+  document.querySelectorAll(".symbol-tab").forEach(b=>b.classList.toggle("active",b.dataset.symbol===selectedSymbol));
+  document.querySelectorAll(".frame-tab").forEach(b=>b.classList.toggle("active",b.dataset.frame===selectedFrame));
+  document.querySelectorAll(".bias-row").forEach(b=>b.classList.toggle("active",
+    b.dataset.symbol===selectedSymbol&&b.dataset.frame===selectedFrame));
+  if(!current){chart(null);$("zone-list").textContent="Nguồn dữ liệu chưa hợp lệ";renderSignalOverview(null,null);return;}
+  const bars=current.frameBarsBySymbol?.[selectedSymbol]?.[selectedFrame]||(selectedSymbol==="ENAUSDT"?(current.frameBars?.[selectedFrame]||current.bars):null);
+  const zones=current.zonesBySymbol?.[selectedSymbol]?.[selectedFrame]||(selectedSymbol==="ENAUSDT"?current.zones?.[selectedFrame]:[]);
+  const assessment=current.assessments?.[selectedSymbol]?.[selectedFrame]||null;
+  chart(assessment?.audit?.status==="VALID"?bars:null,zones,selectedSymbol,assessment);
+  $("cutoff").textContent=when(assessment?.closedAt)+" ICT";
+  $("atr").textContent=selectedSymbol==="ENAUSDT"&&selectedFrame==="15m"?formatNumber(current.atr15,6):"—";
+  $("quality").textContent=assessment?.audit?.status||"NOT_RUN";
+  $("chart-status").textContent=assessment?.audit?.status==="VALID"?"● VALID CLOSED BARS":"● DATA INCOMPLETE";
+  $("chart-status").className="statusdot "+(assessment?.audit?.status==="VALID"?"ok":"danger");
+  renderScenario(assessment);renderSignalOverview(current,assessment);renderZones(current);
+}
+function addReason(container,s){const e=document.createElement("span");e.className="reason";e.textContent=s;container.append(e)}
+function renderTicket(d){
+  const s=d.signal;
+  $("copy").disabled=!s;
+  $("ticket-tag").textContent=s?"READY":"NO TRADE";
+  $("ticket-tag").className="tag "+(s?"green":"amber");
+  $("entry").textContent=s?formatNumber(s.entry,5):"—";
+  $("stop").textContent=s?formatNumber(s.stop,5):"—";
+  $("target").textContent=s?formatNumber(s.target,5):"—";
+  $("rr").textContent=s&&s.netRR!=null?formatNumber(s.netRR,2)+":1":"—";
+  $("plan-label").textContent=s?s.side+" · "+s.orderType:"WATCH / EVIDENCE GATE";
+  $("plan-title").textContent=s?"Kế hoạch có điều kiện":"Chưa có lệnh đủ điều kiện";
+  $("plan-description").textContent=s?"15m breakout đã qua retest 5m. Hết hạn: "+when(s.expiresAt)+". Giá chỉ có hiệu lực trong cửa sổ setup.":"Không phát hành giá vào lệnh nếu thiếu retest, vùng mục tiêu hay R:R ≥2.";
+  const reasons=$("reasons");reasons.replaceChildren();
+  const msgs=s?["CLOSED 15M","RETEST 5M","BTC GATE", "NET RR ≥2"]:d.watch?.reasons?.slice(0,5)||d.assessment15m?.reasons?.slice(0,5)||[d.reason||"WAIT_NEW_15M_SETUP"];
+  msgs.forEach(v=>addReason(reasons,v));
+  renderSizing();
+}
+function renderSizing(){
+  $("position-size").textContent="SIZE = NULL: thiếu equity và tổng rủi ro mở đã xác minh, phí/slippage/funding theo tài khoản. Đầu vào thủ công không mở gate.";
+}
+function renderGates(d){
+  const gates=[
+    ["Source integrity",d.dataQuality==="VALID_NATIVELY_CLOSED_CONTIGUOUS_REQUIRED_WINDOWS"?"PASS":"FAIL"],
+    ["BTC 4H swing",d.btcH4||"UNKNOWN"],
+    ["BTC 1H swing",d.btcH1||"UNKNOWN"],
+    ["ENA 1H structure",d.enaH1||"UNKNOWN"],
+    ["15m assessment",d.assessment15m?.state||"NOT_RECORDED"],
+    ["15m RVOL / min 1.5",d.latest15m?.rvol==null?"NULL":formatNumber(d.latest15m.rvol,2)],
+    ["15m 20-bar breakout",d.latest15m?.breakoutLong?"LONG":d.latest15m?.breakoutShort?"SHORT":"NONE"],
+    ["15m taker delta (ENA)",d.latest15m?.takerDeltaBase==null?"NULL":formatNumber(d.latest15m.takerDeltaBase,0)],
+    ["15m setup",d.watch?.kind||"NONE"],
+    ["5m confirmation",d.signal?"PASS":"WAIT"],
+    ["Net RR ≥ 2.00",d.signal?formatNumber(d.signal.netRR,2)+":1":"NOT_PROVEN"],
+    ["BTC.D",d.btcDominance?.status==="VALID"?formatNumber(d.btcDominance.valuePct,2)+"% CoinGecko (market cap)":d.btcDominance?.status||"UNAVAILABLE"],
+    ["Full causal score", "NOT_VERIFIED"],
+    ["Actual order execution","DISABLED"]
+  ];
+  const table=$("audit-body");table.replaceChildren();
+  gates.forEach(([label,value])=>{
+    const tr=document.createElement("tr"),a=document.createElement("td"),b=document.createElement("td");
+    a.textContent=label;b.textContent=value;b.className=value==="PASS"||value==="UP"?"ok":value==="FAIL"||value==="DOWN"?"danger":"";
+    const c=document.createElement("td"),p=document.createElement("span");
+    p.className="pill "+((value==="PASS"||value==="UP")?"":"neutral");
+    p.textContent=value==="PASS"?"VALID":value==="FAIL"?"BLOCKED":(value==="NOT_VERIFIED"?"NULL":"INFO");
+    c.append(p);tr.append(a,b,c);table.append(tr);
+  });
+}
+function renderMultiframe(d){
+  const body=$("frame-assessments");body.replaceChildren();
+  for(const symbol of ["BTCUSDT","ENAUSDT"])for(const tf of ["15m","1h","4h","1d","1w","1M"]){
+    const a=d.assessments?.[symbol]?.[tf],tr=document.createElement("tr");
+    const values=[symbol,tf,a?.close==null?"NULL":formatNumber(a.close,symbol==="BTCUSDT"?1:5),
+      a?.structure||"UNKNOWN",
+      a?.volume?.volumeBase==null?"NULL":formatNumber(a.volume.volumeBase,0)+" "+symbol.replace("USDT","")+" · RVOL "+formatNumber(a.volume.rvol,2),
+      a?.state||"DATA_INCOMPLETE",a?.tradePermission||"NO_TRADE",
+      a?[...a.reasons,...a.blockedBy].join(" · "):"SOURCE_UNAVAILABLE"];
+    values.forEach((v,i)=>{const td=document.createElement("td");td.textContent=v;
+      if(i===5)td.className=v==="WATCH"?"warn":v==="DATA_INCOMPLETE"?"danger":"";
+      tr.append(td)});
+    tr.title=a?("Closed "+when(a.closedAt)+" · decision "+when(a.decisionAt)+
+      " · bars "+a.audit.closedCount+" / warm-up "+a.audit.requiredWarmup+
+      " · gaps "+a.audit.gaps+" · duplicates "+a.audit.duplicates+
+      " · conflicts "+a.audit.conflicts+" · "+[...a.reasons,...a.blockedBy].join(", ")):"Source unavailable";
+    body.append(tr);
+  }
+}
+function renderEvents(d){
+  const container=$("events");container.replaceChildren();
+  if(!historyRecords.length){
+    const e=document.createElement("div");e.className="tiny muted";
+    e.textContent=historyStatus;container.append(e);
+  }
+  for(const r of historyRecords){
+    const e=document.createElement("div");e.className="event";
+    const line=document.createElement("div");line.className="eventline";
+    const content=document.createElement("div");content.className="event-content";
+    const top=document.createElement("div");top.className="event-top";
+    const title=document.createElement("span");
+    title.textContent=r.symbol+" · "+r.timeframe+" · "+r.state;
+    const time=document.createElement("span");time.className="muted";
+    time.textContent=when(r.expectedCutoff||r.firstMissedCutoff);
+    top.append(title,time);
+    const detail=document.createElement("div");detail.className="event-detail";
+    detail.textContent="Decision "+when(r.decisionAt)+" · receipt "+when(r.receivedAt)+
+      " · "+(r.timeliness||"NOT_OBSERVED")+" · "+[...(r.reasons||[]),...(r.blockedBy||[])].join(" · ");
+    if(r.kind==="SCHEDULE_GAP")detail.textContent+=" · thiếu "+r.count+" nến";
+    const proof=document.createElement("details"),label=document.createElement("summary");
+    label.textContent="Chi tiết quyết định và nguồn · "+(r.release?.codeHash||"").slice(0,10);
+    const pre=document.createElement("pre");pre.style.cssText="white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px;max-height:260px;overflow:auto";
+    pre.textContent=JSON.stringify(r,null,2);proof.append(label,pre);
+    content.append(top,detail,proof);e.append(line,content);container.append(e);
+  }
+  $("history-more").hidden=!historyCursor;
+}
+async function refreshHistory(append=false){
+  const request=++historyRequest;
+  const query=new URLSearchParams({date:$("history-date").value,limit:"30"});
+  if($("history-symbol").value)query.set("symbol",$("history-symbol").value);
+  if($("history-frame").value)query.set("frame",$("history-frame").value);
+  if(append&&historyCursor)query.set("before",historyCursor);
+  try{
+    const response=await fetch("/api/history?"+query,{cache:"no-store",signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw new Error("HTTP_"+response.status);
+    const result=await response.json();
+    if(request!==historyRequest)return;
+    if(!["RECORDED_SHADOW_DECISIONS","NO_RECORDED_DECISIONS"].includes(result.status))
+      throw new Error(result.status||"HISTORY_UNAVAILABLE");
+    historyRecords=append?[...historyRecords,...result.records]:result.records;
+    historyCursor=result.nextCursor||null;
+    historyStatus="Chưa có quyết định được ghi cho bộ lọc này. Thời gian trước khi bật nhật ký chưa được xác minh.";
+    renderEvents(current);
+  }catch(e){
+    if(request!==historyRequest)return;
+    historyStatus="Nhật ký chưa đọc được: "+e.message;
+    $("history-health").textContent=historyStatus;$("history-health").className="tiny danger";
+    if(!historyRecords.length)renderEvents(current);
+  }
+}
+for(const id of ["history-date","history-symbol","history-frame"])
+  $(id).addEventListener("change",()=>refreshHistory());
+$("history-more").addEventListener("click",()=>refreshHistory(true));
+
+function render(d){
+  current=d;
+  $("last-sync").textContent="Updated "+when(d.runAt);
+  if(d.status==="DATA_BLOCKED"){
+    $("market-status").textContent="DATA BLOCKED";$("market-status").className="metric-value danger";
+    $("market-foot").textContent=d.reason||"Dữ liệu không hợp lệ";
+    $("chart-status").textContent="● SOURCE ERROR";$("chart-status").className="statusdot danger";
+    $("ena-foot").textContent="Không có dữ liệu nguồn đủ tin cậy";
+    $("btc-foot").textContent="Đợi kết nối Binance USD-M";
+    $("quality").textContent="FAIL";renderTicket(d);renderGates(d);drawFrame();renderBias(d);renderMultiframe(d);renderEvents(d);return;
+  }
+  $("market-status").textContent=d.status.replaceAll("_"," ");
+  $("market-status").className="metric-value "+(d.status==="SIGNAL_READY"?"ok":"warn");
+  $("market-foot").textContent=d.status==="SIGNAL_READY"?"Validated research plan":d.status==="WATCH"?"Có quan sát, chưa đủ gate vào lệnh":"Không có setup 15m hợp lệ";
+  $("ena-price").textContent=formatNumber(d.lastClose,5);
+  $("btc-price").textContent=formatNumber(d.btcLastClose,1);
+  $("ena-foot").textContent="Native close · "+when(d.decisionCutoff)+" ICT";
+  $("btc-foot").textContent="4H: "+d.btcH4+" · 1H: "+d.btcH1;
+  $("chart-status").textContent="● VALID CLOSED BARS";$("chart-status").className="statusdot ok";
+  $("cutoff").textContent=when(d.decisionCutoff)+" ICT";$("atr").textContent=formatNumber(d.atr15,6);
+  $("quality").textContent="PASS";drawFrame();renderBias(d);renderTicket(d);renderGates(d);renderMultiframe(d);renderEvents(d);
+}
+async function refresh(){
+  if(loading)return;loading=true;$("refresh").disabled=true;$("refresh-text").textContent="Đồng bộ...";
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),27000);
+  try{
+    const resp=await fetch("/api/live",{signal:controller.signal,cache:"no-store"});
+    if(!resp.ok)throw new Error("HTTP_"+resp.status);
+    const d=await resp.json();
+    render(d);
+  }catch(e){render({status:"DATA_BLOCKED",reason:"API_UNAVAILABLE_OR_TIMEOUT",runAt:Date.now(),signal:null,watch:null})}
+  finally{clearTimeout(timeout);loading=false;$("refresh").disabled=false;$("refresh-text").textContent="Refresh data"}
+}
+$("refresh").addEventListener("click",refresh);
+document.querySelectorAll(".frame-tab").forEach(b=>b.addEventListener("click",()=>{selectedFrame=b.dataset.frame;drawFrame()}));
+document.querySelectorAll(".symbol-tab").forEach(b=>b.addEventListener("click",()=>{selectedSymbol=b.dataset.symbol;drawFrame();if(current)renderBias(current)}));
+$("copy").addEventListener("click",async()=>{
+  const s=current?.signal;if(!s)return;
+  const text="SCM15 RESEARCH PLAN / NO REAL ORDERS\n"+s.side+" ENAUSDT 15m\n"+
+  "ORDER "+s.orderType+"\nENTRY "+s.entry+"\nSTOP "+s.stop+"\nTARGET "+s.target+
+  "\nNET RR "+s.netRR+":1\nEXPIRES "+when(s.expiresAt)+" ICT\nASSUMED COST 0.23%; VALIDATION UNPROVEN";
+  try{await navigator.clipboard.writeText(text);$("copy").textContent="✓ Đã sao chép kế hoạch"}catch(e){$("copy").textContent="Clipboard chưa được cấp quyền"}
+  setTimeout(()=>$("copy").textContent="⧉ Sao chép kế hoạch giao dịch",2000);
+});
+async function refreshCloud(){
+  try{
+    const response=await fetch("/api/feed",{cache:"no-store"});
+    const f=await response.json();
+    cloudHistory=Array.isArray(f.archivedReadyPlans)?f.archivedReadyPlans:[];
+    const ok=f.status==="CLOUD_SCAN_FRESH";
+    const label=f.schedulerFresh?"● CLOUD "+(f.sourceHealth||"UNKNOWN"):
+      f.status==="CLOUD_SCAN_STALE"?"● CLOUD SCAN STALE":"● "+f.status;
+    $("cloud-health").textContent=label+(f.polledAt?" · "+when(f.polledAt):"");
+    $("cloud-health").className="tiny "+(ok?"ok":"warn");
+    $("cloud-foot").textContent="Cloud: "+(f.polledAt?when(f.polledAt)+" ICT":f.status);
+    $("history-health").textContent=label+" · "+(f.validFrameCount??0)+"/12 khung hợp lệ"+
+      " · gap "+(f.missingBarsDetected??"chưa xác minh")+" · "+(f.codeHash||"").slice(0,10);
+    $("history-health").className="tiny "+(f.schedulerFresh&&f.cohortMatches?"ok":"warn");
+    await refreshHistory();
+  }catch(e){
+    $("cloud-health").textContent="● CLOUD FEED OFFLINE";$("cloud-health").className="tiny danger";
+    $("cloud-foot").textContent="Cloud heartbeat unavailable";
+  }
+}
+setInterval(clock,1000);setInterval(()=>{if(!document.hidden)refresh()},45000);
+setInterval(()=>{if(!document.hidden)refreshCloud()},180000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){refresh();refreshCloud();}});
+clock();refresh();refreshCloud();refreshHistory();
+</script>
+</body></html>

@@ -1,12 +1,13 @@
-name: SCM15 cloud 15m scan
+name: SCM SHADOW closed-bar journal
 on:
   schedule:
-    - cron: '3,18,33,48 * * * *'
+    - cron: '2/5 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '.github/workflows/scm15-cloud-scan.yml'
+      - 'terminal/**'
 
 permissions:
   contents: write
@@ -17,82 +18,35 @@ concurrency:
 
 jobs:
   scan:
-    name: Verify closed-15m research plan
-    runs-on: ubuntu-slim
-    timeout-minutes: 3
-    env:
-      TERMINAL_URL: https://scmv3-signal15.vercel.app/api/live
+    name: Persist BTC and ENA decisions across six native frames
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pinned v4.2.2
-      - name: Read independent Binance market decision
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Verify reviewed scanner and execution lock
+        working-directory: terminal
+        run: |
+          npm test
+          npm run check
+          node scripts/build-release.mjs --check
+      - name: Read and persist public SHADOW assessment
+        id: scan
+        env:
+          SCM_TERMINAL_URL: https://skydeal.app/api/live
+        run: node terminal/scripts/cloud-scan.mjs
+      - name: Publish heartbeat, immutable scan and decision journal
+        if: always() && steps.scan.outcome != 'skipped'
         run: |
           set -euo pipefail
-          curl --fail-with-body -sSL --retry 2 --retry-delay 3 --max-time 75 --connect-timeout 12 "$TERMINAL_URL" -o /tmp/scm15-decision.json
-          python3 - <<'PY'
-          import json, time, datetime
-          with open('/tmp/scm15-decision.json', encoding='utf-8') as f:
-              d = json.load(f)
-          state = d.get('status')
-          decision_at = d.get('decisionCutoff')
-          print('SCM15 state:', state, 'cutoff:', decision_at)
-          print('Model:', d.get('model'), 'Execution enabled:', d.get('actualOrdersEnabled'))
-          if d.get('actualOrdersEnabled') is not False:
-              raise SystemExit('FATAL: execution mode changed')
-          if state not in ('NO_SETUP', 'WATCH', 'SIGNAL_READY'):
-              raise SystemExit('Data/source unavailable: ' + str(d.get('reason')))
-          if not isinstance(decision_at, int) or not 0 <= time.time()*1000-decision_at <= 30*60*1000:
-              raise SystemExit('Stale or invalid 15m decision')
-          if d.get('dataQuality') != 'VALID_NATIVELY_CLOSED_CONTIGUOUS_REQUIRED_WINDOWS':
-              raise SystemExit('Market data not validated')
-          if state == 'SIGNAL_READY':
-              s = d.get('signal') or {}
-              p = [s.get(k) for k in ('entry', 'stop', 'target', 'netRR')]
-              if not all(isinstance(x, (int, float)) and x > 0 for x in p):
-                  raise SystemExit('READY WITHOUT COMPLETE ENTRY/SL/TP/RR')
-              if p[3] < 2:
-                  raise SystemExit('READY NET_RR < 2')
-              if s.get('executionEnabled') is not False:
-                  raise SystemExit('EXECUTION MUST REMAIN DISABLED')
-              print('RESEARCH SIGNAL READY:', s['side'], 'Entry:', p[0], 'SL:', p[1], 'TP:', p[2], 'netRR:', p[3])
-          else:
-              print('No executable trade recommendation published: all trade gates remain active.')
-          print('Cloud scan verified at', datetime.datetime.now(datetime.timezone.utc).isoformat())
-          from pathlib import Path
-          path=Path('data/scm15/state.json')
-          path.parent.mkdir(parents=True,exist_ok=True)
-          try: previous=json.loads(path.read_text())
-          except (OSError,ValueError): previous={}
-          history=previous.get('signals',[])
-          if not isinstance(history,list):history=[]
-          item=d.get('signal')
-          if state=='SIGNAL_READY' and item and not any(row.get('id')==item.get('id') for row in history):
-              history.append({
-                  k:item.get(k) for k in ('id','side','entry','stop','target','netRR',
-                                          'setupAt','knownAt','expiresAt','trigger5mClosedAt','model')
-              })
-          safe={
-              'scheduler':'GITHUB_ACTIONS_BEST_EFFORT_NOT_SLA',
-              'polledAt':int(time.time()*1000),
-              'decisionCutoff':decision_at,
-              'model':d.get('model'),
-              'status':state,
-              'market':d.get('market'),
-              'sourceQuality':d.get('dataQuality'),
-              'signal':item if state=='SIGNAL_READY' else None,
-              'signals':history[-200:],
-              'executionEnabled':False,
-              'description':'Public delayed heartbeat, research-only; no real orders',
-          }
-          path.write_text(json.dumps(safe,ensure_ascii=False,indent=2)+'\n')
-          print('Cloud state persisted safely; total READY',len(history[-200:]))
-          PY
-      - name: Commit public heartbeat and conditional-plan archive
-        run: |
-          set -euo pipefail
-          git config user.name "SCM15 Research"
+          git config user.name "SCM SHADOW Journal"
           git config user.email "scm15@users.noreply.github.com"
-          git add data/scm15/state.json
+          git add data/scm15
           if ! git diff --cached --quiet; then
-            git commit -m "data(scm15): new closed-15m cloud scan"
+            git commit -m "data(scm15): persist SHADOW decisions and scan evidence"
             git push origin HEAD:main
           fi

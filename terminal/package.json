@@ -1,0 +1,1 @@
+{"name":"scmv3-signal15","private":true,"version":"1.1.0","type":"module","engines":{"node":">=22.12"},"scripts":{"test":"node --test tests/*.test.js","check":"node scripts/check-source.mjs","build":"node scripts/build-release.mjs","start":"node dev-server.js","scan":"node scripts/cloud-scan.mjs"}}

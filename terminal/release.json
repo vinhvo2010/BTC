@@ -1,0 +1,60 @@
+{
+  "release": "SCM15_SHADOW_JOURNAL_V1",
+  "repository": "vinhvo2010/BTC",
+  "rootDirectory": "terminal",
+  "codeHash": "84455a3e5c49a548135bbb94bbc44d355e034e3a8bbda7e007b7c03cdb22d8aa",
+  "deploymentConfigHash": "5e5c58184a5df133f28be90b3e252b2ee9a988653e1af5080e0b8c863e3889bf",
+  "configHash": "96f6e7225a750fb2ae06a4b01291b26a5f78e9b28e43cec61712490303c4b691",
+  "config": {
+    "plan": "SCM15_RESEARCH_PLAN_V2",
+    "multiframe": "SCM15_MULTIFRAME_RESEARCH_V1",
+    "bias": "SCM15_FRAME_EVIDENCE_SHARE_V1",
+    "parameters": {
+      "costRoundtripFraction": 0.0023,
+      "minRvol": 1.5,
+      "minNetRR": 2,
+      "maxSetupAgeMs": 2700000,
+      "pivot15mRadius": 2,
+      "pivotHigherRadius": 3,
+      "breakoutLookbackBars": 20
+    },
+    "frames": [
+      "15m",
+      "1h",
+      "4h",
+      "1d",
+      "1w",
+      "1M"
+    ],
+    "symbols": [
+      "BTCUSDT",
+      "ENAUSDT"
+    ],
+    "journal": "SCM15_DECISION_JOURNAL_V1",
+    "scheduler": "GITHUB_ACTIONS_5M_BEST_EFFORT",
+    "decisionDeadlineMs": 300000,
+    "mode": "SHADOW",
+    "executionEnabled": false,
+    "paperOrderCreated": false
+  },
+  "sourceHashes": {
+    "api/feed.js": "7448f6c97fe6af450b54ac7640c56155b68f4672ae4fffd427dd0c25ee8294a5",
+    "api/history.js": "17d45d3e035ced14725c2fc109f6e6103b297469508f38a792980fd7c2b8cf9c",
+    "api/live.js": "cc6cc9840ec72f7f6cc4422b764396cf5513996fea02206a3dfbee0c4c3e02be",
+    "index.html": "ba7d47b138f2c523d1625273704ba3ff13d0cdf195cd93202f93e077243f33e5",
+    "lib/cloud-read.js": "b6e9da42d46ed8c519f8a178be725d84e55650477e960984801f1ec6dbdda599",
+    "lib/engine.js": "0da09399eadab96e55672f192186f281fff24a1533f92a8210d28353c2abe5b0",
+    "lib/journal.js": "37ac5caaec3453ca26f90f3944d6f712c471854d68adcc2f9f90e198c5c7e955",
+    "lib/multiframe.js": "c24b754846fc654a75c6e7f8ba3467692f302485a703e3a05bf957d395520226",
+    "lib/provenance.js": "11dcb025c8146e3af71bb97cdccc798fbc8c8a047733ff54b514bfd8a8170ddb",
+    "lib/store.js": "9884470ba4ea3ccb9fb3402324a2d9009fc4edf9f37031697bb1b0f1bba470a5",
+    "lib/zones.js": "da93596f1f9233e5801c14124cf24703180b9caba324b4a9a4820f64376cdbe6",
+    "package.json": "49f672f9104ea91977131934e124a0e18dc976fd72204ec9ae97b4953d8657ef",
+    "scripts/build-release.mjs": "ca09eb0d139f0a064f4bd44af193b020ae027be95388f0025c308340f032f986",
+    "scripts/check-source.mjs": "e922aedb902926bb4d73ada25fd49f04a87398187088a484738bed9c37d015dc",
+    "scripts/cloud-scan.mjs": "a01613200528e787e46a9e04c8c9b4ed0b979f6e8d77c9c16bdece8a9a91d4b1",
+    "vercel.json": "5e5c58184a5df133f28be90b3e252b2ee9a988653e1af5080e0b8c863e3889bf"
+  },
+  "mode": "SHADOW",
+  "executionEnabled": false
+}
