@@ -1,0 +1,13 @@
+{
+  "scheduler": "GITHUB_ACTIONS_BEST_EFFORT_NOT_SLA",
+  "polledAt": 1791775213213,
+  "decisionCutoff": 1791774900000,
+  "model": "SCM15_RESEARCH_PLAN_V1",
+  "status": "NO_SETUP",
+  "market": "BINANCE_USDM_PERPETUAL",
+  "sourceQuality": "VALID_NATIVELY_CLOSED_CONTIGUOUS_REQUIRED_WINDOWS",
+  "signal": null,
+  "signals": [],
+  "executionEnabled": false,
+  "description": "Public delayed heartbeat, research-only; no real orders"
+}
