@@ -1,0 +1,55 @@
+name: SCM15 cloud 15m scan
+on:
+  schedule:
+    - cron: '3,18,33,48 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scm15-cloud-readonly
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    name: Verify closed-15m research plan
+    runs-on: ubuntu-slim
+    timeout-minutes: 3
+    env:
+      TERMINAL_URL: https://scmv3-signal15.vercel.app/api/live
+    steps:
+      - name: Read independent Binance market decision
+        run: |
+          set -euo pipefail
+          curl --fail-with-body -sSL --retry 2 --retry-delay 3 --max-time 75 --connect-timeout 12 "$TERMINAL_URL" -o /tmp/scm15-decision.json
+          python3 - <<'PY'
+          import json, time, datetime
+          with open('/tmp/scm15-decision.json', encoding='utf-8') as f:
+              d = json.load(f)
+          state = d.get('status')
+          decision_at = d.get('decisionCutoff')
+          print('SCM15 state:', state, 'cutoff:', decision_at)
+          print('Model:', d.get('model'), 'Execution enabled:', d.get('actualOrdersEnabled'))
+          if d.get('actualOrdersEnabled') is not False:
+              raise SystemExit('FATAL: execution mode changed')
+          if state not in ('NO_SETUP', 'WATCH', 'SIGNAL_READY'):
+              raise SystemExit('Data/source unavailable: ' + str(d.get('reason')))
+          if not isinstance(decision_at, int) or not 0 <= time.time()*1000-decision_at <= 30*60*1000:
+              raise SystemExit('Stale or invalid 15m decision')
+          if d.get('dataQuality') != 'VALID_NATIVELY_CLOSED_CONTIGUOUS_REQUIRED_WINDOWS':
+              raise SystemExit('Market data not validated')
+          if state == 'SIGNAL_READY':
+              s = d.get('signal') or {}
+              p = [s.get(k) for k in ('entry', 'stop', 'target', 'netRR')]
+              if not all(isinstance(x, (int, float)) and x > 0 for x in p):
+                  raise SystemExit('READY WITHOUT COMPLETE ENTRY/SL/TP/RR')
+              if p[3] < 2:
+                  raise SystemExit('READY NET_RR < 2')
+              if s.get('executionEnabled') is not False:
+                  raise SystemExit('EXECUTION MUST REMAIN DISABLED')
+              print('RESEARCH SIGNAL READY:', s['side'], 'Entry:', p[0], 'SL:', p[1], 'TP:', p[2], 'netRR:', p[3])
+          else:
+              print('No executable trade recommendation published: all trade gates remain active.')
+          print('Cloud scan verified at', datetime.datetime.now(datetime.timezone.utc).isoformat())
+          PY
