@@ -1,4 +1,4 @@
-name: SCM SHADOW closed-bar journal
+name: SCM SHADOW native-bar scheduler
 on:
   schedule:
     - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/scm15-cloud-scan.yml'
+      - '.github/workflows/scm-shadow-closed-bars.yml'
       - 'terminal/**'
 
 permissions:
